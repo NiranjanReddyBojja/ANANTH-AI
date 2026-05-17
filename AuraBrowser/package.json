@@ -1,0 +1,24 @@
+{
+  "name": "aurabrowser",
+  "version": "1.0.0",
+  "description": "AI-powered desktop web browser with intelligent sidepanel",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging"
+  },
+  "keywords": [
+    "electron",
+    "browser",
+    "ai",
+    "llm",
+    "openai",
+    "ollama"
+  ],
+  "author": "AuraBrowser Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {}
+}
