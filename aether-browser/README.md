@@ -121,30 +121,40 @@ node drive.js
 
 ### ✅ Implemented & Verified
 
+**Core Browsing:**
 - [x] Tab creation, navigation, history
-- [x] Network ad/tracker blocking (EasyList, EasyPrivacy, uBlock Origin lists)
-- [x] Cosmetic CSS filters (site-specific + generic class/id-based)
+- [x] Session restore on startup
+- [x] Bookmarks, history, downloads
+- [x] Split-view tab layout
+- [x] Keyboard shortcuts (Ctrl+T, Ctrl+W, etc.)
+
+**Ad & Tracker Blocking:**
+- [x] Network blocking via CDP Fetch interception (EasyList, EasyPrivacy, uBO lists)
+- [x] Cosmetic CSS filters (site-specific + generic class/id-based, collected post-load)
+- [x] Per-tab shield stats & real-time counters
+
+**Privacy & Security:**
 - [x] Fingerprint guard + Global Privacy Control injection
 - [x] Tracking param stripping (utm_*, fbclid, etc.)
-- [x] Session restore on startup
+- [x] Encrypted password vault (Argon2id, AES-256-GCM, OS keyring)
+
+**Gaming & Performance:**
 - [x] Tab hibernation (scroll position, screenshot, process cleanup)
-- [x] Split-view tab layout
-- [x] Bookmarks, history, downloads
-- [x] Encrypted password vault (Argon2id, AES-256-GCM)
-- [x] Per-tab shield stats
-- [x] Telemetry (memory, CPU, process count)
-- [x] Keyboard shortcuts (Ctrl+T, Ctrl+W, etc.)
-- [x] Settings modal (11 sections)
-- [x] Gamer sidebar + resource limiter display
+- [x] **Game Mode (Windows):** Auto-detect fullscreen games, hibernate background tabs (1 min timeout, max 2 live), apply hard limits (2 GB RAM, 15% CPU) via Job Objects
+- [x] Game detection with hysteresis (debounced, tolerates alt-tab & loading screens)
+- [x] Priority demotion (Idle priority while game runs)
+- [x] In-game overlay hotkey (Alt+G, Windows-only)
+- [x] Telemetry (memory, CPU, process count, excluding threads)
+- [x] Resource limiter display & settings
+- [x] Gamer sidebar + settings modal (11 sections)
 
 ### ⚠️ Known Limitations
 
 1. **Sandbox** — Tauri's CEF runtime runs **without the Chromium sandbox on Windows** (per its docs); Linux/Mac sandboxing untested
-2. **RAM/CPU limits** — Hard limits (Windows Job Objects) are Windows-only; on other platforms they are live gauges only, not enforced
-3. **Game detection** — Windows-only; uses foreground window detection
-4. **Global hotkey (Alt+G)** — Windows-only; overlay opacity also Windows-only
-5. **Performance claims** — "40–60% lower RAM" and "zero FPS impact" are not measured; hibernation trades latency for memory
-6. **YouTube/Twitch ad blocking** — Best-effort via JSON-prune scriptlets; unverified on live sites (Twitch ads are server-side)
+2. **Game Mode** — Full game detection + tab hibernation + limits enforcement is Windows-only. On other platforms, detection works but limits are telemetry-only (not enforced). To test on Windows: run a fullscreen game like CS2 or Elden Ring while Aether is open—watch the sidebar show "Game: cs2.exe" in green, tabs auto-hibernate, and resource limits apply.
+3. **Global hotkey (Alt+G)** — Windows-only; overlay opacity also Windows-only
+4. **Performance claims** — "40–60% lower RAM" and "zero FPS impact" are not measured; hibernation trades latency for memory
+5. **YouTube/Twitch ad blocking** — Best-effort via JSON-prune scriptlets; unverified on live sites (Twitch ads are server-side)
 7. **Password autofill** — Not implemented; vault is manual lookup only
 8. **Extension signing** — Extensions load unpacked at startup via `--load-extension`; no signature check or Web Store integration
 9. **Privacy settings** — Some (e.g., donottrack, webrtc policy) require a browser restart to apply
