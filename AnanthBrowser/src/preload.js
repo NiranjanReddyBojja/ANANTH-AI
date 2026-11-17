@@ -1,5 +1,5 @@
 /**
- * AuraBrowser - Preload Script
+ * Ananth Browser - Preload Script
  *
  * The only bridge between the browser UI and the main process. It is loaded
  * into the UI window only; web pages never see it.
@@ -13,7 +13,7 @@ function subscribe(channel, callback) {
   return () => ipcRenderer.removeListener(channel, listener);
 }
 
-contextBridge.exposeInMainWorld('aura', {
+contextBridge.exposeInMainWorld('ananth', {
   platform: process.platform,
 
   // Persistence

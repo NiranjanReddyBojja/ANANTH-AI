@@ -1,5 +1,5 @@
 /**
- * AuraBrowser - Browser UI
+ * Ananth Browser - Browser UI
  *
  * Tabs, address bar, navigation, find-in-page, zoom, bookmarks, history and
  * downloads. Every web page is a <webview> guest; pages that are not the
@@ -172,16 +172,16 @@ function sessionSnapshot() {
   };
 }
 
-const saveSession = debounce(() => window.aura.save('session', sessionSnapshot()), 500);
-const saveHistory = debounce(() => window.aura.save('history', state.history), 1500);
-const saveBookmarks = debounce(() => window.aura.save('bookmarks', state.bookmarks), 300);
-const saveSettings = debounce(() => window.aura.save('settings', state.settings), 300);
+const saveSession = debounce(() => window.ananth.save('session', sessionSnapshot()), 500);
+const saveHistory = debounce(() => window.ananth.save('history', state.history), 1500);
+const saveBookmarks = debounce(() => window.ananth.save('bookmarks', state.bookmarks), 300);
+const saveSettings = debounce(() => window.ananth.save('settings', state.settings), 300);
 
 window.addEventListener('beforeunload', () => {
-  window.aura.saveSync('session', sessionSnapshot());
-  window.aura.saveSync('history', state.history);
-  window.aura.saveSync('bookmarks', state.bookmarks);
-  window.aura.saveSync('settings', state.settings);
+  window.ananth.saveSync('session', sessionSnapshot());
+  window.ananth.saveSync('history', state.history);
+  window.ananth.saveSync('bookmarks', state.bookmarks);
+  window.ananth.saveSync('settings', state.settings);
 });
 
 // ============================================================================
@@ -437,7 +437,7 @@ function closeTab(tab, { remember = true } = {}) {
 
   // Closing the last tab closes the window; the session keeps that tab.
   if (state.tabs.length === 1) {
-    window.aura.closeWindow();
+    window.ananth.closeWindow();
     return;
   }
 
@@ -479,7 +479,7 @@ function toggleMute(tab) {
 
 async function showTabMenu(tab, event) {
   const index = state.tabs.indexOf(tab);
-  const choice = await window.aura.popupMenu([
+  const choice = await window.ananth.popupMenu([
     { id: 'new', label: 'New Tab to the Right' },
     { type: 'separator' },
     { id: 'reload', label: 'Reload', enabled: Boolean(tab.url) },
@@ -745,7 +745,7 @@ function updateChrome() {
 
 function updateWindowTitle() {
   const tab = activeTab();
-  document.title = tab && tab.url ? `${tabTitle(tab)} - AuraBrowser` : 'AuraBrowser';
+  document.title = tab && tab.url ? `${tabTitle(tab)} - Ananth Browser` : 'Ananth Browser';
 }
 
 function updateNavButtons() {
@@ -1172,7 +1172,7 @@ function renderBookmarksBar() {
     });
     chip.addEventListener('contextmenu', async (event) => {
       event.preventDefault();
-      const choice = await window.aura.popupMenu([
+      const choice = await window.ananth.popupMenu([
         { id: 'open', label: 'Open in New Tab' },
         { type: 'separator' },
         { id: 'delete', label: 'Delete' }
@@ -1313,24 +1313,24 @@ function downloadRow(download) {
       active ? bar : null
     ])
   ]);
-  main.addEventListener('click', () => window.aura.downloadAction('open', { path: download.path }));
+  main.addEventListener('click', () => window.ananth.downloadAction('open', { path: download.path }));
 
   const actions = [];
   if (active) {
     actions.push(el('button', {
       class: 'text-btn',
       text: download.paused ? 'Resume' : 'Pause',
-      onclick: () => window.aura.downloadAction(download.paused ? 'resume' : 'pause', { id: download.id })
+      onclick: () => window.ananth.downloadAction(download.paused ? 'resume' : 'pause', { id: download.id })
     }));
     actions.push(el('button', {
       class: 'icon-btn small', title: 'Cancel',
-      onclick: () => window.aura.downloadAction('cancel', { id: download.id })
+      onclick: () => window.ananth.downloadAction('cancel', { id: download.id })
     }, icon('close')));
   } else {
     if (done) {
       actions.push(el('button', {
         class: 'icon-btn small', title: 'Show in folder',
-        onclick: () => window.aura.downloadAction('reveal', { path: download.path })
+        onclick: () => window.ananth.downloadAction('reveal', { path: download.path })
       }, icon('folder')));
     }
     actions.push(el('button', {
@@ -1370,7 +1370,7 @@ function onDownloadUpdate(download) {
 }
 
 async function clearBrowsingData() {
-  const choice = await window.aura.confirmClearData();
+  const choice = await window.ananth.confirmClearData();
   if (choice >= 1) clearHistory();
 }
 
@@ -1382,7 +1382,7 @@ async function showAppMenu() {
   const rect = $('btn-menu').getBoundingClientRect();
   const tab = activeTab();
   const hasPage = Boolean(tab && tab.webview);
-  const choice = await window.aura.popupMenu([
+  const choice = await window.ananth.popupMenu([
     { id: 'new-tab', label: 'New Tab', accelerator: 'CmdOrCtrl+T' },
     { id: 'reopen-tab', label: 'Reopen Closed Tab', accelerator: 'CmdOrCtrl+Shift+T', enabled: state.closedTabs.length > 0 },
     { type: 'separator' },
@@ -1505,23 +1505,23 @@ function wireUI() {
 }
 
 async function start() {
-  document.body.classList.add(`platform-${window.aura.platform}`);
+  document.body.classList.add(`platform-${window.ananth.platform}`);
   wireUI();
 
-  const saved = await window.aura.loadState();
+  const saved = await window.ananth.loadState();
   state.history = Array.isArray(saved.history) ? saved.history.filter((entry) => entry && entry.url) : [];
   state.historyByUrl = new Map(state.history.map((entry) => [entry.url, entry]));
   state.bookmarks = Array.isArray(saved.bookmarks) ? saved.bookmarks.filter((item) => item && item.url) : [];
   Object.assign(state.settings, saved.settings);
   document.body.classList.toggle('fullscreen', Boolean(saved.fullscreen));
 
-  window.aura.onCommand(runCommand);
-  window.aura.onDownload(onDownloadUpdate);
-  window.aura.onFullscreen((fullscreen) => {
+  window.ananth.onCommand(runCommand);
+  window.ananth.onDownload(onDownloadUpdate);
+  window.ananth.onFullscreen((fullscreen) => {
     document.body.classList.toggle('fullscreen', fullscreen);
     if (!fullscreen) document.body.classList.remove('page-fullscreen');
   });
-  window.aura.onOpenTab(({ url, background, openerId }) => {
+  window.ananth.onOpenTab(({ url, background, openerId }) => {
     const opener = tabByWebContentsId(openerId);
     createTab({
       url,
@@ -1530,7 +1530,7 @@ async function start() {
       index: opener ? state.tabs.indexOf(opener) + 1 : undefined
     });
   });
-  window.aura.onSearch(({ query, openerId }) => {
+  window.ananth.onSearch(({ query, openerId }) => {
     const opener = tabByWebContentsId(openerId);
     createTab({ url: searchUrl(query), index: opener ? state.tabs.indexOf(opener) + 1 : undefined });
   });

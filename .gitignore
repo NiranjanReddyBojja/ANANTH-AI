@@ -8,8 +8,8 @@ build/
 *.js.map
 
 # Electron specific
-AuraBrowser/node_modules/.bin/
-AuraBrowser/node_modules/electron/dist/
+AnanthBrowser/node_modules/.bin/
+AnanthBrowser/node_modules/electron/dist/
 
 # Logs
 *.log

@@ -1,5 +1,5 @@
 {
-  "name": "aurabrowser",
+  "name": "ananth-browser",
   "version": "2.0.0",
   "description": "A fast, minimal desktop web browser built on Electron",
   "main": "src/main.js",
@@ -13,7 +13,7 @@
     "tabs",
     "chromium"
   ],
-  "author": "AuraBrowser Team",
+  "author": "Ananth Browser Team",
   "license": "MIT",
   "devDependencies": {
     "electron": "^45.3.3"

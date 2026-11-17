@@ -1,5 +1,5 @@
 /**
- * AuraBrowser - Main Process
+ * Ananth Browser - Main Process
  *
  * Owns the window, the application menu (and with it every keyboard
  * shortcut), page context menus, downloads, permissions and persistence.
@@ -18,7 +18,7 @@ const isWin = process.platform === 'win32';
 const TAB_STRIP_HEIGHT = 40;
 
 // Lets tests and side-by-side installs use an isolated profile.
-if (process.env.AURA_USER_DATA) app.setPath('userData', process.env.AURA_USER_DATA);
+if (process.env.ANANTH_USER_DATA) app.setPath('userData', process.env.ANANTH_USER_DATA);
 
 let mainWindow = null;
 let store = null;

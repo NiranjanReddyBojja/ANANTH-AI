@@ -1,4 +1,4 @@
-# AuraBrowser
+# Ananth Browser
 
 A fast, minimal desktop web browser built on Electron (Chromium). It behaves the way
 you expect a browser to behave: tabs, a combined address/search bar, history,
@@ -29,7 +29,7 @@ bookmarks, downloads and the usual keyboard shortcuts.
 Requires Node.js 22.12 or newer.
 
 ```bash
-cd AuraBrowser
+cd AnanthBrowser
 npm install
 npm start
 ```
@@ -62,7 +62,7 @@ On macOS use ⌘ instead of Ctrl unless noted.
 ## Project structure
 
 ```
-AuraBrowser/
+AnanthBrowser/
 ├── package.json
 └── src/
     ├── main.js       # Main process: window, menu and shortcuts, context menus,

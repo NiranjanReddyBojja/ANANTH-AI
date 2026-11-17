@@ -1,5 +1,5 @@
 /**
- * AuraBrowser - Persistent store
+ * Ananth Browser - Persistent store
  *
  * Tiny JSON-file store kept in the user data directory. One file per key,
  * written atomically (temp file + rename) and debounced so frequent updates
