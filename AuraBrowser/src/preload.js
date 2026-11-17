@@ -1,72 +1,39 @@
 /**
  * AuraBrowser - Preload Script
- * 
- * Secure bridge between renderer and main process.
- * Exposes only necessary APIs to the renderer via contextBridge.
+ *
+ * The only bridge between the browser UI and the main process. It is loaded
+ * into the UI window only; web pages never see it.
  */
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Expose protected methods that allow the renderer process to use
-// IPC functions without exposing the entire ipcRenderer object
-contextBridge.exposeInMainWorld('electronAPI', {
-  
-  /**
-   * Send a chat message to LLM API with streaming
-   * @param {Object} options - Chat options
-   * @param {Array} options.messages - Array of message objects {role, content}
-   * @param {string} options.endpoint - API endpoint URL
-   * @param {string} options.model - Model name to use
-   * @param {string} options.apiKey - API key for authentication
-   * @returns {Promise<Object>} Result object
-   */
-  sendChatMessage: (options) => ipcRenderer.invoke('llm-stream', options),
+function subscribe(channel, callback) {
+  const listener = (_event, ...args) => callback(...args);
+  ipcRenderer.on(channel, listener);
+  return () => ipcRenderer.removeListener(channel, listener);
+}
 
-  /**
-   * Listen for streaming response chunks from LLM
-   * @param {Function} callback - Function to call with each chunk
-   * @returns {Function} Unsubscribe function
-   */
-  onStreamChunk: (callback) => {
-    const subscription = (_event, data) => callback(data);
-    ipcRenderer.on('llm-stream-chunk', subscription);
-    return () => ipcRenderer.removeListener('llm-stream-chunk', subscription);
-  },
+contextBridge.exposeInMainWorld('aura', {
+  platform: process.platform,
 
-  /**
-   * Listen for streaming errors
-   * @param {Function} callback - Function to call on error
-   * @returns {Function} Unsubscribe function
-   */
-  onStreamError: (callback) => {
-    const subscription = (_event, data) => callback(data);
-    ipcRenderer.on('llm-stream-error', subscription);
-    return () => ipcRenderer.removeListener('llm-stream-error', subscription);
-  },
+  // Persistence
+  loadState: () => ipcRenderer.invoke('state:load'),
+  save: (key, value) => ipcRenderer.send('store:set', key, value),
+  saveSync: (key, value) => ipcRenderer.sendSync('store:set-sync', key, value),
 
-  /**
-   * Request navigation to a URL
-   * @param {string} url - URL to navigate to
-   */
-  navigateToUrl: (url) => ipcRenderer.invoke('navigate-webview', url),
+  // Native menus and dialogs
+  popupMenu: (items, position) => ipcRenderer.invoke('menu:popup', items, position),
+  confirmClearData: () => ipcRenderer.invoke('data:confirm-clear'),
 
-  /**
-   * Get current webview URL
-   * @returns {Promise<string|null>} Current URL or null
-   */
-  getCurrentUrl: () => ipcRenderer.invoke('get-webview-url'),
+  // Downloads
+  downloadAction: (action, payload) => ipcRenderer.send('download:action', action, payload),
+  onDownload: (callback) => subscribe('download:update', callback),
 
-  /**
-   * Check if running in Electron
-   * @returns {boolean} True if in Electron environment
-   */
-  isElectron: true,
+  // Events from the main process
+  onCommand: (callback) => subscribe('command', callback),
+  onOpenTab: (callback) => subscribe('tab:open', callback),
+  onSearch: (callback) => subscribe('tab:search', callback),
+  onFullscreen: (callback) => subscribe('window:fullscreen', callback),
 
-  /**
-   * Platform information
-   */
-  platform: process.platform
+  closeWindow: () => ipcRenderer.send('window:close')
 });
-
-// Log preload script execution for debugging
-console.log('[AuraBrowser] Preload script loaded successfully');

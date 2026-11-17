@@ -1,229 +1,96 @@
 # AuraBrowser
 
-An AI-powered desktop web browser with an intelligent sidepanel assistant. Built with Electron, featuring real-time LLM integration for page analysis, summarization, and interactive chat.
+A fast, minimal desktop web browser built on Electron (Chromium). It behaves the way
+you expect a browser to behave: tabs, a combined address/search bar, history,
+bookmarks, downloads and the usual keyboard shortcuts.
 
 ## Features
 
-- **Minimalist UI**: Clean, dark-themed interface with intuitive navigation controls
-- **WebView Rendering**: Full Chromium-based web page rendering
-- **AI Sidepanel**: Collapsible intelligent assistant panel
-- **Page Analysis**: Scrape and analyze webpage content with AI
-- **Quick Actions**: 
-  - Summarize page content
-  - Find contradictions and issues
-  - Explain technical terms
-- **Streaming Responses**: Real-time AI response generation
-- **Chat Interface**: Persistent conversation history with context awareness
+- **Tabs** – open, close, reorder by dragging, duplicate, mute, reopen closed tabs.
+  Links that ask for a new tab get one; sign-in popups open as real popups.
+- **Address bar** – type a URL or a search. Suggestions come from your history and
+  bookmarks, with inline autocompletion of sites you visit often.
+- **Navigation** – back, forward, reload/stop, loading indicator, link preview,
+  error pages with a reload button.
+- **Find in page**, **zoom** (remembered per site), **print**, **full screen video**.
+- **Bookmarks** – star button, bookmarks bar and a bookmarks panel.
+- **History** – searchable, grouped by day; frequently visited sites appear on the
+  new tab page.
+- **Downloads** – saved to your Downloads folder with progress, pause/resume/cancel.
+- **Session restore** – your tabs come back when you reopen the browser. Background
+  tabs only load when you switch to them, so startup stays quick.
+- **Right-click menus** on pages (open link in new tab, copy, save image, spelling
+  suggestions, inspect).
+- **Light and dark themes** that follow the system setting.
+- **Search engine** choice: Google, DuckDuckGo or Bing (in the ⋮ menu).
 
-## Project Structure
+## Getting started
+
+Requires Node.js 22.12 or newer.
+
+```bash
+cd AuraBrowser
+npm install
+npm start
+```
+
+`npm run dev` starts it with Chromium logging enabled.
+
+## Keyboard shortcuts
+
+On macOS use ⌘ instead of Ctrl unless noted.
+
+| Action | Shortcut |
+| --- | --- |
+| New tab / close tab | Ctrl+T / Ctrl+W |
+| Reopen closed tab | Ctrl+Shift+T |
+| Next / previous tab | Ctrl+Tab / Ctrl+Shift+Tab |
+| Jump to tab 1–8 / last tab | Ctrl+1…8 / Ctrl+9 |
+| Focus address bar | Ctrl+L |
+| Back / forward | Alt+← / Alt+→ (macOS: ⌘[ / ⌘]) |
+| Reload / hard reload | Ctrl+R or F5 / Ctrl+Shift+R |
+| Find in page | Ctrl+F, then Enter / Shift+Enter |
+| Zoom in / out / reset | Ctrl++ / Ctrl+- / Ctrl+0 |
+| Bookmark this tab | Ctrl+D |
+| Show bookmarks bar | Ctrl+Shift+B |
+| History | Ctrl+H (macOS: ⌘Y) |
+| Downloads | Ctrl+J (macOS: ⌥⌘L) |
+| Clear browsing data | Ctrl+Shift+Delete |
+| Developer tools | F12 or Ctrl+Shift+I |
+| Open typed address in a new tab | Alt+Enter |
+
+## Project structure
 
 ```
 AuraBrowser/
-├── package.json          # Project configuration and dependencies
-├── src/
-│   ├── main.js          # Electron main process
-│   ├── preload.js       # Secure IPC bridge
-│   ├── index.html       # Application HTML structure
-│   ├── styles.css       # Complete styling
-│   └── renderer.js      # Frontend logic and AI integration
-└── README.md            # This file
+├── package.json
+└── src/
+    ├── main.js       # Main process: window, menu and shortcuts, context menus,
+    │                 # downloads, permissions, IPC
+    ├── store.js      # JSON persistence (history, bookmarks, session, settings)
+    ├── preload.js    # Bridge between the browser UI and the main process
+    ├── index.html    # Browser UI markup
+    ├── styles.css    # Browser UI styles (light and dark)
+    └── renderer.js   # Tabs, address bar, panels and webview management
 ```
 
-## Prerequisites
+## Privacy and security
 
-- Node.js (v18 or higher recommended)
-- npm or yarn
-- For AI features, one of the following:
-  - **Ollama** (local): Install from https://ollama.ai and run `ollama run llama3`
-  - **OpenAI API**: Valid API key
+- Web pages run in sandboxed `<webview>` guests with no Node.js access and no
+  preload script; only the browser UI can talk to the main process.
+- Camera, microphone, location, notifications and clipboard-read access prompt per
+  site; the answer is remembered until you quit.
+- History, bookmarks and the open-tab list are stored locally as JSON files in the
+  app's user data folder. Nothing is sent anywhere. **Clear Browsing Data** removes
+  history and, optionally, cookies and cache.
 
-## Installation
-
-1. **Clone or navigate to the project directory:**
-   ```bash
-   cd AuraBrowser
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Setup AI Backend (choose one):**
-
-   **Option A: Ollama (Local, Recommended for Development)**
-   ```bash
-   # Install Ollama from https://ollama.ai
-   ollama pull llama3
-   ollama serve
-   ```
-
-   **Option B: OpenAI API**
-   - Edit `src/renderer.js` and update the CONFIG object:
-   ```javascript
-   const CONFIG = {
-     llmEndpoint: 'https://api.openai.com/v1/chat/completions',
-     llmModel: 'gpt-3.5-turbo',
-     apiKey: 'your-api-key-here',
-     // ...
-   };
-   ```
-
-4. **Run the application:**
-   ```bash
-   npm start
-   ```
-
-   Or for development with logging:
-   ```bash
-   npm run dev
-   ```
-
-## Configuration
-
-Edit `src/renderer.js` to customize:
-
-```javascript
-const CONFIG = {
-  // API endpoint (Ollama default)
-  llmEndpoint: 'http://localhost:11434/v1/chat/completions',
-  
-  // Model name
-  llmModel: 'llama3',
-  
-  // API key (for OpenAI or other authenticated APIs)
-  apiKey: '',
-  
-  // Maximum characters to send for page analysis
-  maxContextLength: 8000,
-};
-```
-
-## Usage Guide
-
-### Basic Navigation
-- Enter URLs in the top bar and press Enter or click Go
-- Use Back/Forward buttons for history navigation
-- Click Refresh to reload the current page
-
-### AI Sidepanel
-- Toggle the sidepanel using the icon in the top-right
-- The sidepanel can be resized by dragging (future enhancement)
-
-### Page Analysis
-1. Navigate to any webpage
-2. Click **"Analyze Page"** in the sidepanel
-3. The AI will scrape the content and provide analysis
-4. After analysis, use quick actions:
-   - **Summarize**: Get a concise summary
-   - **Find Issues**: Identify contradictions or problems
-   - **Explain**: Get explanations of technical terms
-
-### Chat
-- Type questions in the chat input
-- Press Enter or click Send
-- The AI has context about the current page after analysis
-- Conversation history is maintained during the session
-
-## API Compatibility
-
-AuraBrowser supports any OpenAI-compatible API endpoint:
-
-- **Ollama** (local): `http://localhost:11434/v1/chat/completions`
-- **OpenAI**: `https://api.openai.com/v1/chat/completions`
-- **LocalAI**: `http://localhost:8080/v1/chat/completions`
-- **vLLM**: Compatible endpoints
-- **Together AI**, **Groq**, etc.
-
-## Security Notes
-
-- **Context Isolation**: Enabled for security
-- **Node Integration**: Disabled in renderer
-- **Sandbox**: Enabled for webview
-- **API Keys**: Never expose API keys in production; use environment variables or secure storage
-
-For production, consider:
-```javascript
-// In main.js, load API key from environment
-const apiKey = process.env.LLM_API_KEY || '';
-```
-
-## Troubleshooting
-
-### "Failed to connect to LLM API"
-- Ensure Ollama is running: `ollama serve`
-- Check if the model is downloaded: `ollama list`
-- Verify the endpoint URL in CONFIG
-
-### "No content found on this page"
-- Some websites block webview access
-- Try a different website
-- Check browser console for errors
-
-### WebView not loading pages
-- Check network connectivity
-- Some sites may block embedding
-- Review CSP settings in main.js
-
-## Development
-
-### Debugging
-Enable detailed logging:
-```bash
-npm run dev
-```
-
-View console logs in:
-- Renderer: DevTools (Ctrl+Shift+I)
-- Main process: Terminal output
-
-### Building for Production
-
-To create distributable packages:
+## Building installers
 
 ```bash
 npm install --save-dev electron-builder
+npx electron-builder
 ```
-
-Add to `package.json`:
-```json
-"scripts": {
-  "build": "electron-builder"
-},
-"build": {
-  "appId": "com.aurabrowser.app",
-  "mac": { "target": "dmg" },
-  "win": { "target": "nsis" },
-  "linux": { "target": "AppImage" }
-}
-```
-
-Then run:
-```bash
-npm run build
-```
-
-## Future Enhancements
-
-- [ ] Multiple tab support
-- [ ] Bookmarks and history management
-- [ ] Download manager
-- [ ] Custom themes
-- [ ] Voice input for chat
-- [ ] Export chat conversations
-- [ ] Plugin/extensions system
-- [ ] Split-view mode
-- [ ] Reading mode
-- [ ] Screenshot capture
 
 ## License
 
-MIT License - Feel free to use and modify for your projects.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
----
-
-**Built with ❤️ using Electron and AI**
+MIT
