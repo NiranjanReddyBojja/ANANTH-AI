@@ -1,0 +1,67 @@
+[package]
+name = "aether"
+version = "0.1.0"
+description = "Aether - a low-RAM, ad-blocking gaming browser"
+edition = "2021"
+rust-version = "1.95"
+license = "MIT"
+
+[lib]
+name = "aether"
+path = "src/lib.rs"
+
+[[bin]]
+name = "aether"
+path = "src/main.rs"
+required-features = ["shell"]
+
+[features]
+default = ["shell"]
+# The Tauri + CEF application shell. Without it the crate is the browser
+# kernel only (shield, storage, vault, governor), which builds and tests
+# anywhere, including cross-checking the Windows code from Linux.
+shell = ["dep:tauri", "dep:tauri-runtime-cef", "dep:tauri-build"]
+# Serve the built UI from inside the binary (set by `tauri build`).
+custom-protocol = ["tauri/custom-protocol"]
+
+[build-dependencies]
+tauri-build = { version = "=3.0.0-alpha.4", optional = true }
+
+[dependencies]
+tauri = { version = "=3.0.0-alpha.6", features = ["unstable", "devtools"], optional = true }
+tauri-runtime-cef = { version = "=3.0.0-alpha.7", features = ["devtools", "unstable"], optional = true }
+
+adblock = { version = "0.13", default-features = false, features = ["embedded-domain-resolver", "full-regex-handling"] }
+rusqlite = { version = "0.43", features = ["bundled"] }
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync", "macros"] }
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "blocking"] }
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+argon2 = "0.5"
+aes-gcm = "0.10"
+rand = "0.8"
+zeroize = "1"
+base64 = "0.22"
+sysinfo = "0.30"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+url = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+log = "0.4"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_System_JobObjects",
+  "Win32_System_Threading",
+  "Win32_System_ProcessStatus",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Shell",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_Graphics_Gdi",
+] }
+
+[dev-dependencies]
+tempfile = "3"

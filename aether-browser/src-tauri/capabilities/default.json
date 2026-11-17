@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "shell",
+  "description": "Permissions for Aether's own UI. Web pages in tabs get none.",
+  "windows": ["main", "overlay"],
+  "webviews": ["shell", "overlay-hud"],
+  "permissions": ["core:event:default", "core:app:default"]
+}
